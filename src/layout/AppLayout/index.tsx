@@ -1,11 +1,10 @@
-import { Toaster } from 'sonner';
+import { Toaster } from 'react-hot-toast';
 
 const AppLayout = ({ children }: any) => {
   return (
     <>
       <main>{children}</main>
-
-      <Toaster position='top-center' />
+      <Toaster />
     </>
   );
 };

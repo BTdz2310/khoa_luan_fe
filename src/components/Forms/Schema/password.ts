@@ -1,4 +1,5 @@
 import z from 'zod';
 
-export const passwordSchema = z.string().min(1, 'Vui lòng nhập mật khẩu');
-export const registerPasswordSchema = z.string().min(8, 'Vui lí nhập mật khất');
+import { passwordRegex } from 'src/regex';
+
+export const registerPasswordSchema = z.string().min(8, { message: 'Mật khẩu phải có tối thiểu 8 ký tự bao gồm: chữ thường, chữ in hoa, số và ký tự đặc biệt' }).regex(passwordRegex, 'Mật khẩu phải có tối thiểu 8 ký tự bao gồm: chữ thường, chữ in hoa, số và ký tự đặc biệt');

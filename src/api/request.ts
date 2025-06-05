@@ -3,7 +3,7 @@
 import TokenManager, { injectBearer } from 'brainless-token-manager';
 import { extend } from 'umi-request';
 
-import { getAccessToken, getRefreshToken, onLogout, setAccessToken, setRefreshToken } from '@services/auth';
+import { getAccessToken, getRefreshToken, onLogout, setAccessToken, setRefreshToken } from '@utils/auth';
 import { ENV } from 'src/utils/env';
 
 import { API_PATH } from './constant';
@@ -159,12 +159,19 @@ export const shouldUpdate = () => {
   return tokenManager.shouldUpdate()
 }
 
-const privateRequest = async (request: any, suffixUrl: string, configs?: any) => {
+type ApiResponse<T> = {
+  data: T;
+  message: string | null;
+  error: string[] | null;
+};
+
+const privateRequest = async <T>(requestFn: typeof request, suffixUrl: string, configs?: any): Promise<ApiResponse<T>> => {
   const token: string = configs?.token ?? ((await tokenManager.getToken()) as string);
 
   const configRequest = token ? injectBearer(token, configs) : configs;
 
-  return request(suffixUrl, configRequest);
+  const response = await requestFn(suffixUrl, configRequest);
+  return response as unknown as ApiResponse<T>;
 };
 
 export { privateRequest, request };

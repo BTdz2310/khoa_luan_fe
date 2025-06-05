@@ -3,20 +3,23 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
 
+import { Profile } from '@custom-types/user';
+import { LoginResponsePayload } from '@services/auth.type';
+import { ROUTE_PATH } from '@shared-constants/route-path';
+import { setAccessToken, setRefreshToken } from '@utils/auth';
+
 export const profileAtom = atom<Profile | null>(null)
-export const subscriptionAtom = atom<Subscription | null>(null)
 
 export const useAuth = () => {
   const [profile, setProfile] = useAtom(profileAtom)
-  const [subscription, setSubscription] = useAtom(subscriptionAtom)
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || ROUTE_PATH.MEMORY
+  const redirect = searchParams.get('redirect') || ROUTE_PATH.HOME
 
   const router = useRouter()
-  const onLogin = (data: any) => {
+  const onLogin = (data: LoginResponsePayload) => {
     try {
-      setAccessToken(data.data.access)
-      setRefreshToken(data.data.refresh)
+      setAccessToken(data.access_token)
+      setRefreshToken(data.refresh_token)
       // router.push(ROUTE_PATH.MEMORY);
       router.push(redirect)
     } catch (error) {
@@ -28,7 +31,5 @@ export const useAuth = () => {
     onLogin,
     profile,
     setProfile,
-    subscription,
-    setSubscription
   }
 }

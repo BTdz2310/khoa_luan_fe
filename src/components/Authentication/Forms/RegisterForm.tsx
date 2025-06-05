@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useRef } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRequest } from 'ahooks';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
@@ -10,20 +10,24 @@ import CustomInput from '@components/Forms/UI/CustomInput';
 import CustomPassword from '@components/Forms/UI/CustomPassword';
 import { Button } from '@components/UI/button';
 import { Form, FormField } from '@components/UI/form';
-import { loginService } from '@services/auth';
+import { Remember, RememberType } from '@custom-types/otp';
+import { setCookieOtp } from '@lib/otp';
+import { registerService } from '@services/auth';
 import { ROUTE_PATH } from '@shared-constants/route-path';
-import { useAuth } from 'src/hook/useAuth';
 
-import { LoginFormSchema, loginFormSchema } from './Schema/login';
+import { registerFormSchema, RegisterFormSchema } from './Schema/register';
 
-const LoginForm = () => {
-  const { onLogin } = useAuth()
+const RegisterForm = () => {
+  const usernameRef = useRef<string>('')
+  const router = useRouter()
 
-  const form = useForm<LoginFormSchema>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<RegisterFormSchema>({
+    resolver: zodResolver(registerFormSchema),
     defaultValues: {
       username: '',
-      password: ''
+      email: '',
+      password: '',
+      confirm_password: '',
     },
     mode: 'onChange',
     reValidateMode: 'onChange',
@@ -31,16 +35,25 @@ const LoginForm = () => {
     shouldFocusError: true
   });
 
-  const { runAsync, loading } = useRequest(loginService, {
+  const { runAsync, loading } = useRequest(registerService, {
     manual: true,
     onSuccess: (data) => {
-      onLogin(data.data)
+      const remember: Remember = {
+        type: RememberType.Register,
+        hash_code: data.data.hash_code,
+        email: form.getValues('email'),
+        user_id: data.data.user_id,
+        username: form.getValues('username')
+      }
+      setCookieOtp(remember)
+      router.push(ROUTE_PATH.REGISTER_CONFIRM)
     },
   })
 
-  const onSubmit = (values: LoginFormSchema) => {
+  const onSubmit = (values: RegisterFormSchema) => {
+    usernameRef.current = values.username
     toast.promise(runAsync(values), {
-      loading: 'Đang đăng nhập...',
+      loading: 'Đang đăng ký...',
       success: (data) => {
         return data.message
       },
@@ -60,8 +73,22 @@ const LoginForm = () => {
           render={({ field }) => (
             <CustomInput
               field={field}
+              isRequired
               label="Tên đăng nhập"
               placeholder="Nhập tên đăng nhập"
+              className='border border-solid !ring-0 focus:!border-[#49BBBD] focus:!shadow-[0px_0px_0px_3px_rgba(72,187,189,0.2)] caret-[#49BBBD] rounded-full h-[52px] w-full pl-[20px] !text-[16px] placeholder:text-[#ACACAC]'
+            />
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <CustomInput
+              field={field}
+              isRequired
+              label="Email"
+              placeholder="Nhập email"
               className='border border-solid !ring-0 focus:!border-[#49BBBD] focus:!shadow-[0px_0px_0px_3px_rgba(72,187,189,0.2)] caret-[#49BBBD] rounded-full h-[52px] w-full pl-[20px] !text-[16px] placeholder:text-[#ACACAC]'
             />
           )}
@@ -72,19 +99,32 @@ const LoginForm = () => {
           render={({ field }) => (
             <CustomPassword
               field={field}
+              isRequired
               label="Mật khẩu"
               placeholder="Nhập mật khẩu"
               className='border border-solid !ring-0 focus:!border-[#49BBBD] focus:!shadow-[0px_0px_0px_3px_rgba(72,187,189,0.2)] caret-[#49BBBD] rounded-full h-[52px] w-full pl-[20px] !text-[16px] placeholder:text-[#ACACAC]'
             />
           )}
         />
-        <Link href={ROUTE_PATH.FORGET} className='font-space-grotesk font-normal text-[16px] self-end !text-[#5B5B5B] hover:underline'>Bạn quên mật khẩu?</Link>
+        <FormField
+          control={form.control}
+          name="confirm_password"
+          render={({ field }) => (
+            <CustomPassword
+              field={field}
+              isRequired
+              label="Xác nhận mật khẩu"
+              placeholder="Nhập mật khẩu"
+              className='border border-solid !ring-0 focus:!border-[#49BBBD] focus:!shadow-[0px_0px_0px_3px_rgba(72,187,189,0.2)] caret-[#49BBBD] rounded-full h-[52px] w-full pl-[20px] !text-[16px] placeholder:text-[#ACACAC]'
+            />
+          )}
+        />
         <Button type='submit' disabled={loading} className='bg-[#49BBBD] font-space-grotesk font-normal text-[16px] text-white rounded-full h-[52px] w-full hover:bg-[#48BBBDCC]'>
-          {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+          {loading ? 'Đang đăng ký...' : 'Đăng ký'}
         </Button>
       </form>
     </Form>
   )
 }
 
-export default LoginForm
+export default RegisterForm

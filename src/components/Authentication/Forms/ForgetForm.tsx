@@ -3,27 +3,27 @@ import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRequest } from 'ahooks';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 import CustomInput from '@components/Forms/UI/CustomInput';
-import CustomPassword from '@components/Forms/UI/CustomPassword';
 import { Button } from '@components/UI/button';
 import { Form, FormField } from '@components/UI/form';
-import { loginService } from '@services/auth';
+import { Remember, RememberType } from '@custom-types/otp';
+import { setCookieOtp } from '@lib/otp';
+import { forgetPasswordService } from '@services/auth';
 import { ROUTE_PATH } from '@shared-constants/route-path';
-import { useAuth } from 'src/hook/useAuth';
 
-import { LoginFormSchema, loginFormSchema } from './Schema/login';
+import { forgetFormSchema, ForgetFormSchema } from './Schema/forget';
 
-const LoginForm = () => {
-  const { onLogin } = useAuth()
+const ForgetForm = () => {
+  const router = useRouter()
 
-  const form = useForm<LoginFormSchema>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<ForgetFormSchema>({
+    resolver: zodResolver(forgetFormSchema),
     defaultValues: {
-      username: '',
-      password: ''
+      email: '',
     },
     mode: 'onChange',
     reValidateMode: 'onChange',
@@ -31,16 +31,23 @@ const LoginForm = () => {
     shouldFocusError: true
   });
 
-  const { runAsync, loading } = useRequest(loginService, {
+  const { runAsync, loading } = useRequest(forgetPasswordService, {
     manual: true,
     onSuccess: (data) => {
-      onLogin(data.data)
+      const remember: Remember = {
+        type: RememberType.Forget,
+        hash_code: data.data.hash_code,
+        email: form.getValues('email'),
+        user_id: data.data.user_id,
+      }
+      setCookieOtp(remember)
+      router.push(ROUTE_PATH.FORGET_CONFIRM)
     },
   })
 
-  const onSubmit = (values: LoginFormSchema) => {
-    toast.promise(runAsync(values), {
-      loading: 'Đang đăng nhập...',
+  const onSubmit = (values: ForgetFormSchema) => {
+    toast.promise(runAsync(values.email), {
+      loading: 'Đang xử lý...',
       success: (data) => {
         return data.message
       },
@@ -56,35 +63,23 @@ const LoginForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-[20px] items-start w-full'>
         <FormField
           control={form.control}
-          name="username"
+          name="email"
           render={({ field }) => (
             <CustomInput
               field={field}
-              label="Tên đăng nhập"
-              placeholder="Nhập tên đăng nhập"
+              label="Email"
+              placeholder="Nhập email"
               className='border border-solid !ring-0 focus:!border-[#49BBBD] focus:!shadow-[0px_0px_0px_3px_rgba(72,187,189,0.2)] caret-[#49BBBD] rounded-full h-[52px] w-full pl-[20px] !text-[16px] placeholder:text-[#ACACAC]'
             />
           )}
         />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <CustomPassword
-              field={field}
-              label="Mật khẩu"
-              placeholder="Nhập mật khẩu"
-              className='border border-solid !ring-0 focus:!border-[#49BBBD] focus:!shadow-[0px_0px_0px_3px_rgba(72,187,189,0.2)] caret-[#49BBBD] rounded-full h-[52px] w-full pl-[20px] !text-[16px] placeholder:text-[#ACACAC]'
-            />
-          )}
-        />
-        <Link href={ROUTE_PATH.FORGET} className='font-space-grotesk font-normal text-[16px] self-end !text-[#5B5B5B] hover:underline'>Bạn quên mật khẩu?</Link>
+        <Link href={ROUTE_PATH.LOGIN} className='font-space-grotesk font-normal text-[16px] self-end !text-[#5B5B5B] hover:underline'>Quay lại Đăng nhập</Link>
         <Button type='submit' disabled={loading} className='bg-[#49BBBD] font-space-grotesk font-normal text-[16px] text-white rounded-full h-[52px] w-full hover:bg-[#48BBBDCC]'>
-          {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+          {loading ? 'Đang xử lý...' : 'Quên mật khẩu'}
         </Button>
       </form>
     </Form>
   )
 }
 
-export default LoginForm
+export default ForgetForm
