@@ -5,8 +5,8 @@ import { useRequest } from 'ahooks';
 import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import OtpInput from 'react-otp-input'
-import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { Button } from '@components/UI/button';
@@ -60,21 +60,21 @@ const RegisterConfirmForm = ({ otpData }: { otpData: Remember }) => {
         return data.message
       },
       error: (error) => {
-        const message = (error as any)?.response?.data?.message || 'Lỗi không xác định';
+        const message = (error as any)?.message || 'Lỗi không xác định';
         return message
       }
     })
   }
 
   const { runAsync: resendFn } = useRequest(
-    () => resendActivateService(otpData.email),
+    () => resendActivateService(otpData.email, otpData.user_id as number),
     {
       manual: true,
       onSuccess: (data) => {
-        setOtpValue(data.data.hash_code)
+        setOtpValue(data.data.hashCode)
         setCookieOtp({
           ...otpData,
-          hash_code: data.data.hash_code
+          hash_code: data.data.hashCode
         })
       },
     }
@@ -90,7 +90,7 @@ const RegisterConfirmForm = ({ otpData }: { otpData: Remember }) => {
         return data.message
       },
       error: (error) => {
-        const message = (error as any)?.response?.data?.message || 'Lỗi không xác định';
+        const message = (error as any)?.message || 'Lỗi không xác định';
         return message
       }
     })

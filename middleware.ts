@@ -13,6 +13,7 @@ const verifyCode = (encryptedData: string) => {
 
 // Check auth from server side here
 export function middleware(request: NextRequest) {
+  const url = request.nextUrl.clone();
   const token = request.cookies.get(process.env.NEXT_PUBLIC_ACCESS_TOKEN_NAME || 'LEARNIVERSE_ACCESS_TOKEN');
   const authRoutes = [ROUTE_PATH.LOGIN, ROUTE_PATH.REGISTER, ROUTE_PATH.REGISTER_CONFIRM, ROUTE_PATH.FORGET, ROUTE_PATH.FORGET_CONFIRM, ROUTE_PATH.FORGET_RESET, '/404']
   const protectedRoutes: string[] = []
@@ -29,77 +30,78 @@ export function middleware(request: NextRequest) {
   }
 
   // Remember Register
-  // if (request.nextUrl.pathname.startsWith(ROUTE_PATH.REGISTER) && !request.nextUrl.pathname.startsWith(ROUTE_PATH.REGISTER_CONFIRM)) {
-  //   const response = NextResponse.next();
-  //   try {
-  //     const encryptedData = request.cookies.get('otp_data')?.value;
-  //     if (encryptedData) {
-  //       const decryptedData = verifyCode(encryptedData) as Remember;
-  //       if (
-  //         decryptedData.type === RememberType.Register &&
-  //         decryptedData.hash_code &&
-  //         decryptedData.email &&
-  //         decryptedData.user_id
-  //       ) {
-  //         const decryptedString = encodeURIComponent(JSON.stringify(decryptedData));
-  //         response.headers.set('x-verify-otp', decryptedString);
-  //       }
-  //     }
-  //   } catch {}
-  //   return response;
-  // }
+  if (request.nextUrl.pathname.startsWith(ROUTE_PATH.REGISTER) && !request.nextUrl.pathname.startsWith(ROUTE_PATH.REGISTER_CONFIRM)) {
+    const response = NextResponse.next();
+    try {
+      const encryptedData = request.cookies.get('otp_data')?.value;
+      if (encryptedData) {
+        const decryptedData = verifyCode(encryptedData) as Remember;
+        if (
+          decryptedData.type === RememberType.Register &&
+          decryptedData.hash_code &&
+          decryptedData.email &&
+          decryptedData.user_id
+        ) {
+          const decryptedString = encodeURIComponent(JSON.stringify(decryptedData));
+          response.headers.set('x-verify-otp', decryptedString);
+        }
+      }
+    } catch {}
+    return response;
+  }
 
-  // // OTP
-  // if (request.nextUrl.pathname.startsWith(ROUTE_PATH.REGISTER_CONFIRM)) {
-  //   try {
-  //     const encryptedData = request.cookies.get('otp_data')?.value;
-  //     const decryptedData = verifyCode(encryptedData || '') as Remember;
-  //     if ((decryptedData.type !== RememberType.Register) || !decryptedData.hash_code || !decryptedData.email || !decryptedData.user_id) {
-  //       return NextResponse.redirect(new URL(ROUTE_PATH.REGISTER, request.url));
-  //     }
-  //     const decryptedString = encodeURIComponent(JSON.stringify(decryptedData))
+  // OTP
+  if (request.nextUrl.pathname.startsWith(ROUTE_PATH.REGISTER_CONFIRM)) {
+    try {
+      const encryptedData = request.cookies.get('otp_data')?.value;
+      const decryptedData = verifyCode(encryptedData || '') as Remember;
+      if ((decryptedData.type !== RememberType.Register) || !decryptedData.hash_code || !decryptedData.email || !decryptedData.user_id) {
+        return NextResponse.redirect(new URL(ROUTE_PATH.REGISTER, request.url));
+      }
+      const decryptedString = encodeURIComponent(JSON.stringify(decryptedData))
 
-  //     const response = NextResponse.next();
-  //     response.headers.set('x-verify-otp', decryptedString);
-  //     return response;
-  //   } catch {
-  //     return NextResponse.redirect(ROUTE_PATH.REGISTER)
-  //   }
-  // }
+      const response = NextResponse.next();
+      response.headers.set('x-verify-otp', decryptedString);
+      return response;
+    } catch {
+      url.pathname = ROUTE_PATH.REGISTER;
+      return NextResponse.redirect(url);
+    }
+  }
 
-  // if (request.nextUrl.pathname.startsWith(ROUTE_PATH.FORGET_CONFIRM)) {
-  //   try {
-  //     const encryptedData = request.cookies.get('otp_data')?.value;
-  //     const decryptedData = verifyCode(encryptedData || '') as Remember;
-  //     if ((decryptedData.type !== RememberType.Forget) || !decryptedData.hash_code || !decryptedData.email || !decryptedData.user_id) {
-  //       return NextResponse.redirect(new URL(ROUTE_PATH.FORGET, request.url));
-  //     }
-  //     const decryptedString = encodeURIComponent(JSON.stringify(decryptedData))
+  if (request.nextUrl.pathname.startsWith(ROUTE_PATH.FORGET_CONFIRM)) {
+    try {
+      const encryptedData = request.cookies.get('otp_data')?.value;
+      const decryptedData = verifyCode(encryptedData || '') as Remember;
+      if ((decryptedData.type !== RememberType.Forget) || !decryptedData.hash_code || !decryptedData.email || !decryptedData.user_id) {
+        return NextResponse.redirect(new URL(ROUTE_PATH.FORGET, request.url));
+      }
+      const decryptedString = encodeURIComponent(JSON.stringify(decryptedData))
 
-  //     const response = NextResponse.next();
-  //     response.headers.set('x-verify-otp', decryptedString);
-  //     return response;
-  //   } catch {
-  //     return NextResponse.redirect(new URL(ROUTE_PATH.FORGET, request.url));
-  //   }
-  // }
+      const response = NextResponse.next();
+      response.headers.set('x-verify-otp', decryptedString);
+      return response;
+    } catch {
+      return NextResponse.redirect(new URL(ROUTE_PATH.FORGET, request.url));
+    }
+  }
 
-  // if (request.nextUrl.pathname.startsWith(ROUTE_PATH.FORGET_RESET)) {
-  //   try {
-  //     const encryptedData = request.cookies.get('otp_data')?.value;
-  //     const decryptedData = verifyCode(encryptedData || '') as Remember;
-  //     if ((decryptedData.type !== RememberType.Forget) || !decryptedData.hash_code || !decryptedData.email || !decryptedData.user_id || !decryptedData.verification_code) {
-  //       return NextResponse.redirect(new URL(ROUTE_PATH.FORGET, request.url));
-  //     }
-  //     const decryptedString = encodeURIComponent(JSON.stringify(decryptedData))
+  if (request.nextUrl.pathname.startsWith(ROUTE_PATH.FORGET_RESET)) {
+    try {
+      const encryptedData = request.cookies.get('otp_data')?.value;
+      const decryptedData = verifyCode(encryptedData || '') as Remember;
+      if ((decryptedData.type !== RememberType.Forget) || !decryptedData.hash_code || !decryptedData.email || !decryptedData.user_id || !decryptedData.verification_code) {
+        return NextResponse.redirect(new URL(ROUTE_PATH.FORGET, request.url));
+      }
+      const decryptedString = encodeURIComponent(JSON.stringify(decryptedData))
 
-  //     const response = NextResponse.next();
-  //     response.headers.set('x-verify-otp', decryptedString);
-  //     return response;
-  //   } catch {
-  //     return NextResponse.redirect(new URL(ROUTE_PATH.FORGET, request.url));
-  //   }
-  // }
+      const response = NextResponse.next();
+      response.headers.set('x-verify-otp', decryptedString);
+      return response;
+    } catch {
+      return NextResponse.redirect(new URL(ROUTE_PATH.FORGET, request.url));
+    }
+  }
   return NextResponse.next();
 }
 

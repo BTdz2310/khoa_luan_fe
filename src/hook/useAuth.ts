@@ -1,7 +1,7 @@
 import { atom, useAtom } from 'jotai';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 
 import { Profile } from '@custom-types/user';
 import { LoginResponsePayload } from '@services/auth.type';
@@ -18,8 +18,8 @@ export const useAuth = () => {
   const router = useRouter()
   const onLogin = (data: LoginResponsePayload) => {
     try {
-      setAccessToken(data.access_token)
-      setRefreshToken(data.refresh_token)
+      setAccessToken(data.accessToken)
+      setRefreshToken(data.refreshToken)
       // router.push(ROUTE_PATH.MEMORY);
       router.push(redirect)
     } catch (error) {

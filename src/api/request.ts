@@ -93,7 +93,7 @@ class NextTokenManager extends TokenManager {
     
         const r = await request.post(API_PATH.AUTH_REFRESH_TOKEN, {
           data: {
-            refresh: refreshToken,
+            refreshToken,
           }
         });
         // console.log(r)
@@ -113,8 +113,8 @@ class NextTokenManager extends TokenManager {
         }
     
         return {
-          token: r.access,
-          refresh_token: r.refresh,
+          token: r.data.accessToken,
+          refresh_token: r.data.refreshToken,
         };
       },
     
