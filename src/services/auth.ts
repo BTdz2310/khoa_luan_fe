@@ -5,7 +5,7 @@ import { LoginFormSchema } from '@components/Authentication/Forms/Schema/login';
 import { RegisterFormSchema } from '@components/Authentication/Forms/Schema/register';
 import { Remember } from '@custom-types/otp';
 
-import { ForgetResponsePayload, LoginResponsePayload, RegisterResponsePayload } from './auth.type';
+import { ForgetResponsePayload, LoginResponsePayload, OtpType, RegisterResponsePayload } from './auth.type';
 
 export const loginService = (values: LoginFormSchema) => {
   return privateRequest<LoginResponsePayload>(request.post, API_PATH.AUTH_LOGIN, {
@@ -29,17 +29,19 @@ export const registerService = (values: RegisterFormSchema) => {
 export const activateService = (otpData: Remember, verification_code: string) => {
   return privateRequest<null>(request.post, API_PATH.AUTH_ACTIVATE, {
     data: {
-      user_id: otpData.user_id,
-      hash_code: otpData.hash_code,
-      verification_code
+      authId: otpData.user_id,
+      hashCode: otpData.hash_code,
+      verificationCode: verification_code
     }
   })
 }
 
-export const resendActivateService = (email: string) => {
-  return privateRequest<RegisterResponsePayload>(request.post, API_PATH.AUTH_RESEND_ACTIVATE, {
+export const resendActivateService = (email: string, auth_id: number) => {
+  return privateRequest<RegisterResponsePayload>(request.post, API_PATH.AUTH_RESEND_OTP, {
     data: {
-      email
+      email,
+      authId: auth_id,
+      type: OtpType.Register
     }
   })
 }
@@ -53,10 +55,10 @@ export const forgetPasswordService = (email: string) => {
 }
 
 export const forgetConfirmPasswordService = (hash_code: string, verification_code: string) => {
-  return privateRequest<ForgetResponsePayload>(request.post, API_PATH.AUTH_FORGET_PASSWORD, {
+  return privateRequest<ForgetResponsePayload>(request.post, API_PATH.AUTH_CONFIRM_FORGET_PASSWORD, {
     data: {
-      hash_code,
-      verification_code
+      hashCode: hash_code,
+      verificationCode: verification_code
     }
   })
 }
@@ -64,11 +66,9 @@ export const forgetConfirmPasswordService = (hash_code: string, verification_cod
 export const forgetResetPasswordService = (otpData: Remember, values: ForgetResetFormSchema) => {
   return privateRequest<null>(request.post, API_PATH.AUTH_RESET_PASSWORD, {
     data: {
-      user_id: otpData.user_id,
-      hash_code: otpData.hash_code,
-      new_password: values.password,
-      confirm_password: values.confirm_password,
-      verification_code: otpData.verification_code
+      hashCode: otpData.hash_code,
+      newPassword: values.password,
+      verificationCode: otpData.verification_code
     }
   })
 }

@@ -1,17 +1,22 @@
 import { Profile } from '@custom-types/user'
 
 export type LoginResponsePayload = {
-  access_token: string
-  refresh_token: string
+  accessToken: string
+  refreshToken: string
   user: Profile
 }
 
 export type RegisterResponsePayload = {
-  user_id: number
-  hash_code: string
+  authId: number
+  hashCode: string
 }
 
 export type ForgetResponsePayload = {
-  user_id: number
-  hash_code: string
+  authId: number
+  hashCode: string
+}
+
+export enum OtpType {
+  Register = 1,
+  Forget = 2
 }

@@ -50,7 +50,7 @@ const ForgetResetForm = ({ otpData }: { otpData: any }) => {
         return data.message
       },
       error: (error) => {
-        const message = (error as any)?.response?.data?.message || 'Lỗi không xác định';
+        const message = (error as any)?.message || 'Lỗi không xác định';
         return message
       }
     })

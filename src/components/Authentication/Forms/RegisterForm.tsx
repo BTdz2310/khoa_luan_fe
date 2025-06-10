@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRequest } from 'ahooks';
@@ -35,14 +35,18 @@ const RegisterForm = () => {
     shouldFocusError: true
   });
 
+  useEffect(() => {
+    form.trigger('confirm_password');
+  }, [form.watch('password')]);
+
   const { runAsync, loading } = useRequest(registerService, {
     manual: true,
     onSuccess: (data) => {
       const remember: Remember = {
         type: RememberType.Register,
-        hash_code: data.data.hash_code,
+        hash_code: data.data.hashCode,
         email: form.getValues('email'),
-        user_id: data.data.user_id,
+        user_id: data.data.authId,
         username: form.getValues('username')
       }
       setCookieOtp(remember)
@@ -58,7 +62,7 @@ const RegisterForm = () => {
         return data.message
       },
       error: (error) => {
-        const message = (error as any)?.response?.data?.message || 'Lỗi không xác định';
+        const message = (error as any)?.message || 'Lỗi không xác định';
         return message
       }
     })

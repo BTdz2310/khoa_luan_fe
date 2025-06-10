@@ -36,9 +36,9 @@ const ForgetForm = () => {
     onSuccess: (data) => {
       const remember: Remember = {
         type: RememberType.Forget,
-        hash_code: data.data.hash_code,
+        hash_code: data.data.hashCode,
         email: form.getValues('email'),
-        user_id: data.data.user_id,
+        user_id: data.data.authId,
       }
       setCookieOtp(remember)
       router.push(ROUTE_PATH.FORGET_CONFIRM)
@@ -52,7 +52,7 @@ const ForgetForm = () => {
         return data.message
       },
       error: (error) => {
-        const message = (error as any)?.response?.data?.message || 'Lỗi không xác định';
+        const message = (error as any)?.message || 'Lỗi không xác định';
         return message
       }
     })

@@ -21,11 +21,15 @@ const Page = ({ otpData }: { otpData: Remember }) => {
 export async function getServerSideProps(context: any) {
   const encodedData = context.req.headers['x-verify-otp'] as string | undefined;
 
+  console.log('data', encodedData)
+
   if (!encodedData) {
     return { notFound: true };
   }
 
   const otpData = JSON.parse(decodeURIComponent(encodedData));
+
+  console.log(otpData)
 
   return {
     props: { otpData },
