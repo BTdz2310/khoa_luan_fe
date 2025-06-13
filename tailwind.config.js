@@ -13,7 +13,11 @@ module.exports = {
   			'space-grotesk': [
   				'Space Grotesk',
   				'sans-serif'
-  			]
+  			],
+				'oswald': [
+					'Oswald',
+					'sans-serif'
+				]
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
