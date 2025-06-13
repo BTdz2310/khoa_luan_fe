@@ -8,4 +8,11 @@ export const API_PATH = {
   AUTH_FORGET_PASSWORD: '/api/auth/forget-password',
   AUTH_RESET_PASSWORD: '/api/auth/reset-password',
   AUTH_CONFIRM_FORGET_PASSWORD: '/api/auth/confirm-forget-password',
+
+  // Home
+  HOME_SEARCH: '/api/home/search',
+  HOME_SEARCH_SUGGEST: '/api/home/search-suggest',
+
+  // Account
+  ACCOUNT_PROFILE: '/api/account/profile',
 };

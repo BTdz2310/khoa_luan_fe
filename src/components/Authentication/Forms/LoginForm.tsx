@@ -78,7 +78,10 @@ const LoginForm = () => {
             />
           )}
         />
-        <Link href={ROUTE_PATH.FORGET} className='font-space-grotesk font-normal text-[16px] self-end !text-[#5B5B5B] hover:underline'>Bạn quên mật khẩu?</Link>
+        <div className='flex items-center justify-between w-full'>
+          <Link href={ROUTE_PATH.HOME} className='font-space-grotesk font-normal text-[16px] !text-[#5B5B5B] hover:underline'>Quay về Trang chủ</Link>
+          <Link href={ROUTE_PATH.FORGET} className='font-space-grotesk font-normal text-[16px] !text-[#5B5B5B] hover:underline'>Bạn quên mật khẩu?</Link>
+        </div>
         <Button type='submit' disabled={loading} className='bg-[#49BBBD] font-space-grotesk font-normal text-[16px] text-white rounded-full h-[52px] w-full hover:bg-[#48BBBDCC]'>
           {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
         </Button>

@@ -22,9 +22,9 @@
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-popover": "^1.1.14",
     "@radix-ui/react-slot": "^1.2.3",
     "ahooks": "^3.8.4",
-    "antd": "^5.24.0",
     "autoprefixer": "^10.4.20",
     "brainless-token-manager": "^1.3.3",
     "class-variance-authority": "^0.7.1",

@@ -1,9 +1,9 @@
-import { Profile } from '@custom-types/user'
+import { Auth } from '@custom-types/user'
 
 export type LoginResponsePayload = {
   accessToken: string
   refreshToken: string
-  user: Profile
+  auth: Auth
 }
 
 export type RegisterResponsePayload = {
