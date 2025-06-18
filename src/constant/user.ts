@@ -1,0 +1,1 @@
+export const defaultAvatar = 'https://cdn-icons-png.flaticon.com/512/6185/6185659.png'

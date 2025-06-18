@@ -8,17 +8,19 @@ import { Input } from '@components/UI/input'
 type InputProps<T extends object, K extends Path<T>> = {
   field: ControllerRenderProps<T, K>;
   label: string;
-  className?: string;
+  inputClassName?: string;
+  labelClassName?: string;
+  containerClassName?: string;
   isRequired?: boolean;
   placeholder?: string
 };
 
-const CustomInput = <T extends object, K extends Path<T>>({ field, className, isRequired = false, label, placeholder = '' }: InputProps<T, K>) => {
+const CustomInput = <T extends object, K extends Path<T>>({ field, inputClassName, containerClassName = 'w-full', labelClassName = 'text-black font-space-grotesk font-normal text-[16px] mb-[12px]', isRequired = false, label, placeholder = '' }: InputProps<T, K>) => {
   return (
-    <FormItem className='w-full'>
+    <FormItem className={containerClassName}>
       {label && (
         <FormLabel>
-          <p className='text-black font-space-grotesk font-normal text-[16px] mb-[12px]'>
+          <p className={labelClassName}>
             {label}
             {isRequired && <span className='text-red-600 pl-[4px]'>*</span>}
           </p>
@@ -26,7 +28,7 @@ const CustomInput = <T extends object, K extends Path<T>>({ field, className, is
       )}
       <FormControl>
         <Input
-          className={className}
+          className={inputClassName}
           placeholder={placeholder}
           {...field}
         />

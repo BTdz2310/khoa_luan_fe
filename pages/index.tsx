@@ -2,7 +2,7 @@ import { ReactElement } from 'react';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-import Home from '@components/Home/Pages/Home';
+import Home from '@components/Home/Pages';
 import MainLayout from '@layout/MainLayout';
 
 const HomePage = () => {

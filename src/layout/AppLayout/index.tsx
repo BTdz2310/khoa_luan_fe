@@ -1,7 +1,7 @@
 import { useMount } from 'ahooks';
 import { Toaster } from 'react-hot-toast';
 
-import { useAuth } from 'src/hook/useAuth';
+import { useAuth } from '@hooks/useAuth';
 
 const AppLayout = ({ children }: any) => {
   const { getProfile } = useAuth();

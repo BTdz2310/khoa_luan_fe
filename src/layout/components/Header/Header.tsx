@@ -1,33 +1,37 @@
 import React from 'react'
 
 import { Menu } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
-import SearchForm from '@components/Home/Forms/Search'
+import { useAuth } from '@hooks/useAuth'
+import SearchForm from '@layout/components/Header/Forms/Search'
 import { ROUTE_PATH } from '@shared-constants/route-path'
-import { useAuth } from 'src/hook/useAuth'
 
-import AvatarPopover from './AvatarPopover'
+const AvatarPopover = dynamic(() => import('@layout/components/Header/AvatarPopover'), {
+  ssr: false,
+});
 
 const Header = () => {
-  const { profile } = useAuth()
+  const { auth, isLoadedProfile } = useAuth()
 
   return (
     <header className='fixed inset-0 z-50 w-screen bg-[#F9F3EF] h-fit'>
       <div className='w-full border-b border-solid border-[#acacac]'>
         <div className='container h-[72px] flex justify-between mx-auto items-center px-[20px] sm:px-0'>
           <div className='flex items-center gap-[32px]'>
-            <Link href={ROUTE_PATH.HOME} className='font-serif font-bold text-[24px] text-black'>Learniverse</Link>
+            <Link href={ROUTE_PATH.HOME} className='font-serif font-bold text-[24px] text-black w-[148px]'>Learniverse</Link>
             <SearchForm />
           </div>
           <div>
-            {profile ? (
-              <>
+            {
+              isLoadedProfile ? auth ? (
                 <AvatarPopover />
-              </>
-            ) : (
-              <Link href={ROUTE_PATH.LOGIN} className='font-space-grotesk font-semibold text-[16px] text-white hover:text-gray-200 py-[12px] px-[24px] bg-[#404A60]'>Đăng nhập</Link>
-            )}
+              ) : (
+                <Link href={ROUTE_PATH.LOGIN} className='font-space-grotesk font-semibold text-[16px] text-white hover:text-gray-200 py-[12px] px-[24px] bg-[#404A60]'>Đăng nhập</Link>
+              )
+                : null
+            }
           </div>
         </div>
       </div>
