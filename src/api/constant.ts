@@ -15,4 +15,7 @@ export const API_PATH = {
 
   // Account
   ACCOUNT_PROFILE: '/api/account/profile',
+
+  // Course
+  COURSE_CATEGORY: '/api/category',
 };

@@ -11,6 +11,7 @@ import Head from 'next/head';
 import { appWithTranslation } from 'next-i18next';
 
 import ErrorBoundary from '@components/ErrorBoundary';
+import DialogProvider from '@components/Providers/DialogProvider';
 import AppLayout from '@layout/AppLayout';
 
 import nextI18nConfig from '../next-i18next.config';
@@ -54,7 +55,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       `}</style>
 
       <ErrorBoundary>
-        <AppLayout>{getLayout(<Component {...pageProps} />)}</AppLayout>
+        <DialogProvider>
+          <AppLayout>{getLayout(<Component {...pageProps} />)}</AppLayout>
+        </DialogProvider>
       </ErrorBoundary>
     </>
   );

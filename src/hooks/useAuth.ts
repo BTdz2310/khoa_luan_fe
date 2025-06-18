@@ -5,16 +5,21 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 
-import { Auth } from '@custom-types/user';
+import { Auth, Profile } from '@custom-types/user';
+import { DialogEnum, useDialog } from '@hooks/useDialog';
 import { profileService } from '@services/account';
 import { LoginResponsePayload } from '@services/auth.type';
 import { ROUTE_PATH } from '@shared-constants/route-path';
 import { setAccessToken, setRefreshToken } from '@utils/auth';
 
-export const profileAtom = atom<Auth | null>(null)
+export const authAtom = atom<Auth | null>(null)
+export const isLoadedProfileAtom = atom(false)
 
 export const useAuth = () => {
-  const [profile, setProfile] = useAtom(profileAtom)
+  const [auth, setAuth] = useAtom(authAtom)
+  const [isLoadedProfile, setIsLoadedProfile] = useAtom(isLoadedProfileAtom)
+  const { open } = useDialog(DialogEnum.CREATE_PROFILE)
+
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || ROUTE_PATH.HOME
 
@@ -23,7 +28,10 @@ export const useAuth = () => {
     try {
       setAccessToken(data.accessToken)
       setRefreshToken(data.refreshToken)
-      setProfile(data.auth)
+      setAuth(data.auth)
+      if (!data.auth.user) {
+        open()
+      }
       // router.push(ROUTE_PATH.MEMORY);
       router.push(redirect)
     } catch (error) {
@@ -42,15 +50,24 @@ export const useAuth = () => {
   const { run: getProfile } = useRequest(profileService, {
     manual: true,
     onSuccess: (data) => {
-      setProfile(data.data)
+      setAuth(data.data)
+      if (!data.data.user) {
+        open()
+      }
+    },
+    onFinally: () => {
+      setIsLoadedProfile(true)
     }
   })
 
   return {
     onLogin,
-    profile,
-    setProfile,
+    auth,
+    setAuth,
+    profile: auth?.user,
+    setProfile: (profile: Profile) => setAuth({ ...(auth as Auth), user: profile }),
     logout,
-    getProfile
+    getProfile,
+    isLoadedProfile
   }
 }

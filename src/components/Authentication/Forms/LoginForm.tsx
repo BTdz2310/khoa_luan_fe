@@ -10,9 +10,9 @@ import CustomInput from '@components/Forms/UI/CustomInput';
 import CustomPassword from '@components/Forms/UI/CustomPassword';
 import { Button } from '@components/UI/button';
 import { Form, FormField } from '@components/UI/form';
+import { useAuth } from '@hooks/useAuth';
 import { loginService } from '@services/auth';
 import { ROUTE_PATH } from '@shared-constants/route-path';
-import { useAuth } from 'src/hook/useAuth';
 
 import { LoginFormSchema, loginFormSchema } from './Schema/login';
 
@@ -62,7 +62,7 @@ const LoginForm = () => {
               field={field}
               label="Tên đăng nhập"
               placeholder="Nhập tên đăng nhập"
-              className='border border-solid !ring-0 focus:!border-[#49BBBD] focus:!shadow-[0px_0px_0px_3px_rgba(72,187,189,0.2)] caret-[#49BBBD] rounded-full h-[52px] w-full pl-[20px] !text-[16px] placeholder:text-[#ACACAC]'
+              inputClassName='border border-solid !ring-0 focus:!border-[#49BBBD] focus:!shadow-[0px_0px_0px_3px_rgba(72,187,189,0.2)] caret-[#49BBBD] rounded-full h-[52px] w-full pl-[20px] !text-[16px] placeholder:text-[#ACACAC]'
             />
           )}
         />
